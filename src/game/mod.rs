@@ -1,2 +1,2 @@
-// mod block;
+mod block;
 pub mod game;

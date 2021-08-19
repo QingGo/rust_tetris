@@ -1,13 +1,10 @@
-pub enum BlockType {
-    BlockI,
-    BlockO,
-}
+use sdl2::pixels::Color;
 
-pub struct Color([u8; 4]);
+pub struct ColorRaw([u8; 4]);
 
-impl Color {
-    pub const BLACK: Color = Color([0, 0, 0, 0xFF]);
-    pub const BLUE: Color = Color([48, 199, 239, 0xFF]);
+impl ColorRaw {
+    // pub const BLACK: ColorRaw = ColorRaw([0, 0, 0, 0xFF]);
+    pub const BLUE: ColorRaw = ColorRaw([48, 199, 239, 0xFF]);
 }
 
 pub trait Block {
@@ -20,10 +17,10 @@ pub trait Block {
 
 const INIT_LEFT_UP_POS: (i32, i32) = (3, 0);
 
-struct BlockI {
+pub struct BlockI {
     left_up_pos: (i32, i32),
     raw_block: [[bool; 4]; 4],
-    color: Color,
+    color: ColorRaw,
 }
 
 fn rotate_4(raw_block: &[[bool; 4]; 4]) -> [[bool; 4]; 4] {
@@ -31,10 +28,11 @@ fn rotate_4(raw_block: &[[bool; 4]; 4]) -> [[bool; 4]; 4] {
     for (y, row) in raw_block.iter().enumerate() {
         for (x, is_exist) in row.iter().enumerate() {
             if *is_exist {
-                // [0, 0] -> [3, 0]
-                // [0, 1] -> [1, 0]
-                // [1, 0] -> [3, 1]
-                new_raw_block[3 - y][x] = true;
+                // [0, 0] -> [0, 3]
+                // [0, 1] -> [1, 3]
+                // [1, 0] -> [0, 2]
+                // println!("rotate {:?} -> {:?}", (x, y), (y, 3 - x));
+                new_raw_block[3 - x][y] = true;
             }
         }
     }
@@ -53,8 +51,8 @@ fn get_blocks(raw_block: &[[bool; 4]; 4]) -> Vec<(i32, i32)> {
     blocks
 }
 
-impl Block for BlockI {
-    fn new() -> BlockI {
+impl BlockI {
+    pub fn new() -> BlockI {
         let left_up_pos = INIT_LEFT_UP_POS.clone();
         let raw_block = [
             [false, false, false, false],
@@ -65,17 +63,38 @@ impl Block for BlockI {
         BlockI {
             left_up_pos: left_up_pos,
             raw_block: raw_block,
-            color: Color::BLUE,
+            color: ColorRaw::BLUE,
         }
     }
 
-    fn rotate(&mut self) {
+    pub fn rotate(&mut self) {
         let new_raw_block = rotate_4(&self.raw_block);
+        // println!("rotate {:?}", new_raw_block);
         self.raw_block = new_raw_block;
+        // println!("rotate {:?}", self.raw_block);
     }
-    fn move_left(&mut self) {}
-    fn move_right(&mut self) {}
-    fn get_blocks(&self) -> Vec<(i32, i32)> {
+    pub fn move_left(&mut self) {
+        self.left_up_pos.0 -= 1
+    }
+    pub fn move_right(&mut self) {
+        self.left_up_pos.0 += 1
+    }
+    pub fn move_down(&mut self) {
+        self.left_up_pos.1 += 1
+    }
+    pub fn get_blocks(&self) -> Vec<(i32, i32)> {
+        // println!("self.left_up_pos {:?}", self.left_up_pos);
         get_blocks(&self.raw_block)
+            .iter()
+            .map(|x| (x.0 + self.left_up_pos.0, x.1 + self.left_up_pos.1))
+            .collect::<Vec<_>>()
+    }
+    pub fn get_colors(&self) -> Color {
+        Color::RGBA(
+            self.color.0[0],
+            self.color.0[1],
+            self.color.0[2],
+            self.color.0[3],
+        )
     }
 }
