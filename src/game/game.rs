@@ -15,6 +15,7 @@ pub struct Game {
     float_block: BlockI,
 }
 
+
 impl Game {
     pub fn new() -> Game {
         Game {
@@ -54,9 +55,13 @@ impl Game {
                 self.blocks[block.1 as usize][block.0 as usize] = true;
                 self.blocks_color[block.1 as usize][block.0 as usize] = self.float_block.get_color();
             }
-            self.float_block = BlockI::new()
+            self.float_block = BlockI::new();
+            // 消除逻辑
+            self.clear_lines();
+
         }
     }
+
     pub fn render(&self, canvas: &mut Canvas<Window>) -> Result<(), String> {
         for (y, row) in self.blocks.iter().enumerate() {
             for (x, is_exist) in row.iter().enumerate() {
@@ -73,5 +78,20 @@ impl Game {
         }
         self.float_block.render(canvas)?;
         Ok(())
+    }
+
+    fn clear_lines(&mut self){
+        let mut line_nums: Vec<usize> = self.blocks.iter().enumerate().filter(|&(_, row)| !row.iter().any(|exist| !exist)).map(|(i, _)| i).collect();
+        // index 从高到低删除
+        line_nums.reverse();
+        for line_num in line_nums.iter(){
+            self.blocks.remove(*line_num);
+            self.blocks_color.remove(*line_num);
+        }
+        // 在零轴填充空白
+        for _ in line_nums{
+            self.blocks.insert(0, vec![false; WIDTH_BLOCKS_COUNT as usize]);
+            self.blocks_color.insert(0, vec![ColorRaw::WITHE; WIDTH_BLOCKS_COUNT as usize]);
+        }
     }
 }

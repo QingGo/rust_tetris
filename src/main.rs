@@ -16,9 +16,7 @@ use settings::settings::*;
 
 
 // to-do
-// 什么时候旋转/移动失效
-// 自己下落，下落加速
-// 堆积和消除的逻辑
+// 消除的逻辑
 // 增加方块类型，且用 trait 实现
 fn main() -> Result<(), String> {
     let (mut canvas, sdl_context) = init_sdl()?;

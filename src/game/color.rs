@@ -7,7 +7,7 @@ pub struct ColorRaw([u8; 4]);
 
 impl ColorRaw {
     pub const WITHE: ColorRaw = ColorRaw([0xFF, 0xFF, 0xFF, 0xFF]);
-    pub const BLACK: ColorRaw = ColorRaw([0, 0, 0, 0xFF]);
+    // pub const BLACK: ColorRaw = ColorRaw([0, 0, 0, 0xFF]);
     pub const BLUE: ColorRaw = ColorRaw([48, 199, 239, 0xFF]);
 
     pub fn set_canvas(&self, canvas: &mut Canvas<Window>) {
