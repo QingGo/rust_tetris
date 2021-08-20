@@ -2,14 +2,12 @@ use super::block::BlockI;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2::rect::Rect;
 
+use crate::settings::settings::*;
 
-const BLOCK_SIZE: u32 = 30;
-const WIDTH: u32 = 12;
-const HEIGHT: u32 = 23;
 
 pub struct Game {
     blocks: Vec<Vec<bool>>,
@@ -20,7 +18,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Game {
         Game {
-            blocks: vec![vec![false; WIDTH as usize]; HEIGHT as usize],
+            blocks: vec![vec![false; WIDTH_BLOCKS_COUNT as usize]; HEIGHT_BLOCKS_COUNT as usize],
             float_block: BlockI::new(),
         }
     }

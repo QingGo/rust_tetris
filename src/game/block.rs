@@ -21,6 +21,8 @@ pub struct BlockI {
     left_up_pos: (i32, i32),
     raw_block: [[bool; 4]; 4],
     color: ColorRaw,
+    fall_distance_per_tick: u32,
+    total_fall_distance: u32,
 }
 
 fn rotate_4(raw_block: &[[bool; 4]; 4]) -> [[bool; 4]; 4] {
@@ -64,6 +66,8 @@ impl BlockI {
             left_up_pos: left_up_pos,
             raw_block: raw_block,
             color: ColorRaw::BLUE,
+            fall_distance_per_tick: 5,
+            total_fall_distance: 0,
         }
     }
 
