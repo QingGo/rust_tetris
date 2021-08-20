@@ -16,8 +16,8 @@ use settings::settings::*;
 
 
 // to-do
-// 消除的逻辑
 // 增加方块类型，且用 trait 实现
+// 游戏失败逻辑和游戏开始界面
 fn main() -> Result<(), String> {
     let (mut canvas, sdl_context) = init_sdl()?;
     let mut g = Game::new();
