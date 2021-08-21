@@ -1,4 +1,5 @@
 [package]
+build = "build.rs"
 name = "rust_tetris"
 version = "0.1.0"
 edition = "2018"
@@ -9,6 +10,11 @@ edition = "2018"
 rand = "0.8.4"
 sdl2 = "0.34"
 
+
+[build-dependencies]
+reqwest = { version = "0.11", features = ["blocking"] }
+futures = "0.3.16"
+zip = "0.5.13"
 
 # SET PATH=%PATH%;E:\vcpkg\installed\x64-windows\bin
 # SET INCLUDE=%INCLUDE%;E:\vcpkg\installed\x64-windows\include
