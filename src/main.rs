@@ -3,8 +3,6 @@ mod settings;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use sdl2::rect::Point;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 use std::time::Duration;
@@ -14,7 +12,7 @@ use game::game::Game;
 use settings::settings::*;
 
 // to-do
-// 游戏失败逻辑和游戏开始界面，图片/音乐，内部窗口，分数
+// 游戏开始/失败界面，图片/音乐，内部窗口，分数
 fn main() -> Result<(), String> {
     let (mut canvas, sdl_context) = init_sdl()?;
     let mut g = Game::new();
@@ -28,7 +26,7 @@ fn main() -> Result<(), String> {
                     ..
                 }
                 | Event::Quit { .. } => break 'mainloop,
-                others => g.reveive_key(others),
+                others => g.reveive_event(others),
             }
         }
 
@@ -40,7 +38,6 @@ fn main() -> Result<(), String> {
             last_time = time_now;
             g.update();
             // 渲染
-            init_background(&mut canvas)?;
             g.render(&mut canvas)?;
             // 展示
             canvas.present();
@@ -72,26 +69,4 @@ fn init_sdl() -> Result<(Canvas<Window>, sdl2::Sdl), String> {
         .build()
         .map_err(|e| e.to_string())?;
     Ok((canvas, sdl_context))
-}
-
-fn init_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
-    canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
-    canvas.clear();
-    // 格子
-    canvas.set_draw_color(Color::RGBA(200, 200, 200, 255));
-    // 横线
-    for height in (BLOCK_SIZE..INNER_HIGHT).step_by(BLOCK_SIZE as usize) {
-        canvas.draw_line(
-            Point::new(0 as i32, height as i32),
-            Point::new(INNER_WIDTH as i32, height as i32),
-        )?;
-    }
-    // 竖线
-    for width in (BLOCK_SIZE..INNER_WIDTH).step_by(BLOCK_SIZE as usize) {
-        canvas.draw_line(
-            Point::new(width as i32, 0 as i32),
-            Point::new(width as i32, INNER_HIGHT as i32),
-        )?;
-    }
-    Ok(())
 }

@@ -198,7 +198,7 @@ impl Block {
         Ok(())
     }
 
-    fn check_collison(&self, blocks: &Vec<Vec<bool>>) -> bool {
+    pub fn check_collison(&self, blocks: &Vec<Vec<bool>>) -> bool {
         let max_height = blocks.len() as i32;
         let max_width = blocks[0].len() as i32;
         for block in self.get_blocks() {
