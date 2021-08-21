@@ -4,20 +4,17 @@ mod settings;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+use sdl2::rect::Point;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2::rect::Point;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use game::game::Game;
 use settings::settings::*;
 
-
-
 // to-do
-// 增加方块类型，且用 trait 实现
-// 游戏失败逻辑和游戏开始界面
+// 游戏失败逻辑和游戏开始界面，图片/音乐，内部窗口，分数
 fn main() -> Result<(), String> {
     let (mut canvas, sdl_context) = init_sdl()?;
     let mut g = Game::new();
@@ -61,7 +58,7 @@ fn get_epoch_ms() -> u128 {
         .as_millis()
 }
 
-fn init_sdl() -> Result<(Canvas<Window>, sdl2::Sdl), String>{
+fn init_sdl() -> Result<(Canvas<Window>, sdl2::Sdl), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
