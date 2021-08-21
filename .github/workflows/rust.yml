@@ -1,0 +1,26 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build --verbose --release
+    - name: copy target to root folder
+      run: cp target/release/rust_tetris.exe ./
+    - uses: actions/upload-artifact@v2
+      with:
+        name: rust_tetris
+        path: |
+          SDL2.dll
+          rust_tetris.exe
