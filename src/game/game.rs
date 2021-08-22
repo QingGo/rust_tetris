@@ -125,6 +125,9 @@ impl Game {
             GameState::UNSTART {} => {
                 init_start_interface(canvas)?;
             }
+            GameState::GAMEOVER {} => {
+                init_gameover_interface(canvas)?;
+            }
             _ => {}
         }
         Ok(())
@@ -184,9 +187,18 @@ fn init_game_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
     Ok(())
 }
 
-fn init_start_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+fn init_img(canvas: &mut Canvas<Window>, img_path: &str) -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
-    let texture = texture_creator.load_texture(Path::new(r"assets/image/start.png"))?;
+    let texture = texture_creator.load_texture(Path::new(img_path))?;
     canvas.copy(&texture, None, None)?;
     Ok(())
+}
+
+
+fn init_start_interface(canvas: &mut Canvas<Window>, ) -> Result<(), String> {
+    init_img(canvas, r"assets/image/start.png")
+}
+
+fn init_gameover_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+    init_img(canvas, r"assets/image/gameover.png")
 }
