@@ -3,14 +3,17 @@ use super::block::{get_random_block, Block};
 use super::state::GameState;
 use crate::settings::color::ColorRaw;
 use sdl2::event::Event;
+use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
+use sdl2::mixer::{InitFlag, AUDIO_S16LSB, DEFAULT_CHANNELS};
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use sdl2::image::{InitFlag, LoadTexture};
 use std::path::Path;
+use std::time::Duration;
+use std::thread;
 
 use crate::settings::settings::*;
 
@@ -23,6 +26,7 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Game {
+        thread::spawn(move || init_bgm().unwrap());
         Game {
             blocks: vec![vec![false; WIDTH_BLOCKS_COUNT as usize]; HEIGHT_BLOCKS_COUNT as usize],
             blocks_color: vec![
@@ -125,7 +129,9 @@ impl Game {
             GameState::UNSTART {} => {
                 init_start_interface(canvas)?;
             }
-            _ => {}
+            GameState::GAMEOVER {} => {
+                init_gameover_interface(canvas)?;
+            }
         }
         Ok(())
     }
@@ -184,9 +190,37 @@ fn init_game_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
     Ok(())
 }
 
-fn init_start_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+fn init_img(canvas: &mut Canvas<Window>, img_path: &str) -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
-    let texture = texture_creator.load_texture(Path::new(r"assets/image/start.png"))?;
+    let texture = texture_creator.load_texture(Path::new(img_path))?;
     canvas.copy(&texture, None, None)?;
+    Ok(())
+}
+
+fn init_start_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+    init_img(canvas, r"assets/image/start.png")
+}
+
+fn init_gameover_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+    init_img(canvas, r"assets/image/gameover.png")
+}
+
+
+fn init_bgm() -> Result<(), String> {
+    let _mixer_context = sdl2::mixer::init(InitFlag::MP3 | InitFlag::MID)?;
+    let sound_file = Path::new(r"assets/music/tetris.mp3");
+    let frequency = 48_000;
+    let format = AUDIO_S16LSB; // signed 16 bit samples, in little-endian byte order
+    let channels = DEFAULT_CHANNELS; // Stereo
+    let chunk_size = 1_024;
+    sdl2::mixer::open_audio(frequency, format, channels, chunk_size)?;
+    sdl2::mixer::allocate_channels(4);
+    let music = sdl2::mixer::Music::from_file(sound_file)?;
+    music.play(-1)?;
+
+    // let sound_chunk = sdl2::mixer::Chunk::from_file(sound_file)?;
+    // sdl2::mixer::Channel::all().play(&sound_chunk, 1)?;
+    
+    std::thread::sleep(Duration::from_millis(100000000));
     Ok(())
 }

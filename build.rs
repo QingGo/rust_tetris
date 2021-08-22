@@ -1,11 +1,6 @@
 extern crate reqwest;
 
 use std::env;
-use std::fs;
-use std::io;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
 use std::path::PathBuf;
 
 
