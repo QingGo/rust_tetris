@@ -59,7 +59,7 @@ fn init_sdl() -> Result<(Canvas<Window>, sdl2::Sdl), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
-        .window("Rust Tetris", INNER_WIDTH, INNER_HIGHT)
+        .window("Rust Tetris", WIDTH, HIGHT)
         .position_centered()
         .build()
         .map_err(|e| e.to_string())?;

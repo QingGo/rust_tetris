@@ -1,6 +1,7 @@
 use super::block::{get_random_block, Block};
 
 use super::state::GameState;
+use super::score::Score;
 use crate::settings::color::ColorRaw;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
@@ -22,6 +23,7 @@ pub struct Game {
     blocks_color: Vec<Vec<ColorRaw>>,
     float_block: Block,
     state: GameState,
+    score: Score,
 }
 
 impl Game {
@@ -35,6 +37,7 @@ impl Game {
             ],
             float_block: get_random_block(),
             state: GameState::UNSTART,
+            score: Score::new(),
         }
     }
     pub fn reveive_event(&mut self, event: Event) {
@@ -96,6 +99,7 @@ impl Game {
                     // 检验游戏失败
                     if self.float_block.check_collison(&self.blocks) {
                         self.state = GameState::GAMEOVER;
+                        self.score.reset_score();
                         println!("游戏结束");
                     }
                     // 消除逻辑
@@ -110,21 +114,22 @@ impl Game {
         match self.state {
             // 开始游戏
             GameState::PLAYING {} => {
-                init_game_background(canvas)?;
+                init_game_background(canvas, (MARGIN, MARGIN))?;
                 for (y, row) in self.blocks.iter().enumerate() {
                     for (x, is_exist) in row.iter().enumerate() {
                         if *is_exist {
                             self.blocks_color[y][x].set_canvas(canvas);
                             canvas.fill_rect(Rect::new(
-                                BLOCK_SIZE as i32 * x as i32,
-                                BLOCK_SIZE as i32 * y as i32,
+                                BLOCK_SIZE as i32 * x as i32 + MARGIN,
+                                BLOCK_SIZE as i32 * y as i32 + MARGIN,
                                 BLOCK_SIZE,
                                 BLOCK_SIZE,
                             ))?;
                         }
                     }
                 }
-                self.float_block.render(canvas)?;
+                self.float_block.render(canvas, (MARGIN, MARGIN))?;
+                self.score.render(canvas, (WIDTH as i32 / 2 + MARGIN, MARGIN * 2))?;
             }
             GameState::UNSTART {} => {
                 init_start_interface(canvas)?;
@@ -159,32 +164,33 @@ impl Game {
             self.blocks_color.remove(*line_num);
         }
         // 在零轴填充空白
-        for _ in line_nums {
+        for _ in line_nums.iter() {
             self.blocks
                 .insert(0, vec![false; WIDTH_BLOCKS_COUNT as usize]);
             self.blocks_color
                 .insert(0, vec![ColorRaw::WITHE; WIDTH_BLOCKS_COUNT as usize]);
         }
+        self.score.add_score_by_clear_lines(line_nums.len() as u32)
     }
 }
 
-fn init_game_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
+fn init_game_background(canvas: &mut Canvas<Window>, offset: (i32, i32)) -> Result<(), String> {
     canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
     canvas.clear();
     // 格子
     canvas.set_draw_color(Color::RGBA(200, 200, 200, 255));
     // 横线
-    for height in (BLOCK_SIZE..INNER_HIGHT).step_by(BLOCK_SIZE as usize) {
+    for height in (0..=INNER_HIGHT).step_by(BLOCK_SIZE as usize) {
         canvas.draw_line(
-            Point::new(0 as i32, height as i32),
-            Point::new(INNER_WIDTH as i32, height as i32),
+            Point::new(0 as i32 + offset.0, height as i32 + offset.1),
+            Point::new(INNER_WIDTH as i32 + offset.0, height as i32 + offset.1),
         )?;
     }
     // 竖线
-    for width in (BLOCK_SIZE..INNER_WIDTH).step_by(BLOCK_SIZE as usize) {
+    for width in (0..=INNER_WIDTH).step_by(BLOCK_SIZE as usize) {
         canvas.draw_line(
-            Point::new(width as i32, 0 as i32),
-            Point::new(width as i32, INNER_HIGHT as i32),
+            Point::new(width as i32 + offset.0, 0 as i32 + offset.1),
+            Point::new(width as i32 + offset.0, INNER_HIGHT as i32 + offset.1),
         )?;
     }
     Ok(())

@@ -184,13 +184,13 @@ impl Block {
         false
     }
 
-    pub fn render(&self, canvas: &mut Canvas<Window>) -> Result<(), String> {
+    pub fn render(&self, canvas: &mut Canvas<Window>, offset: (i32, i32)) -> Result<(), String> {
         self.color.set_canvas(canvas);
         for block in self.get_blocks() {
             // println!("block {:?}", block);
             canvas.fill_rect(Rect::new(
-                BLOCK_SIZE as i32 * block.0,
-                BLOCK_SIZE as i32 * block.1,
+                BLOCK_SIZE as i32 * block.0 + offset.0,
+                BLOCK_SIZE as i32 * block.1 + offset.1,
                 BLOCK_SIZE,
                 BLOCK_SIZE,
             ))?;
