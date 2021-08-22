@@ -1,0 +1,3 @@
+[submodule "rust-sdl2-libs"]
+	path = rust-sdl2-libs
+	url = https://github.com/QingGo/rust-sdl2-libs

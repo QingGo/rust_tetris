@@ -9,6 +9,8 @@ use sdl2::rect::Point;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use sdl2::image::{InitFlag, LoadTexture};
+use std::path::Path;
 
 use crate::settings::settings::*;
 
@@ -104,7 +106,7 @@ impl Game {
         match self.state {
             // 开始游戏
             GameState::PLAYING {} => {
-                init_background(canvas)?;
+                init_game_background(canvas)?;
                 for (y, row) in self.blocks.iter().enumerate() {
                     for (x, is_exist) in row.iter().enumerate() {
                         if *is_exist {
@@ -119,6 +121,9 @@ impl Game {
                     }
                 }
                 self.float_block.render(canvas)?;
+            }
+            GameState::UNSTART {} => {
+                init_start_interface(canvas)?;
             }
             _ => {}
         }
@@ -157,7 +162,7 @@ impl Game {
     }
 }
 
-fn init_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
+fn init_game_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
     canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
     canvas.clear();
     // 格子
@@ -176,5 +181,12 @@ fn init_background(canvas: &mut Canvas<Window>) -> Result<(), String> {
             Point::new(width as i32, INNER_HIGHT as i32),
         )?;
     }
+    Ok(())
+}
+
+fn init_start_interface(canvas: &mut Canvas<Window>) -> Result<(), String> {
+    let texture_creator = canvas.texture_creator();
+    let texture = texture_creator.load_texture(Path::new(r"assets/image/start.png"))?;
+    canvas.copy(&texture, None, None)?;
     Ok(())
 }
