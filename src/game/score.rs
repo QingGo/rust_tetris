@@ -21,10 +21,11 @@ impl Score {
     }
 
     pub fn add_score_by_clear_lines(&mut self, lines_num: u32) {
-        self.score_now += lines_num * lines_num / 2 * BASE_CLEAR_LINE_SCORE;
+        self.score_now += lines_num * (lines_num + 1) * BASE_CLEAR_LINE_SCORE / 2;
         if self.score_now > self.score_highest {
             self.score_highest = self.score_now;
         }
+        // println!("score_now: {}", self.score_now);
     }
 
     pub fn reset_score(&mut self) {

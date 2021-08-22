@@ -170,6 +170,7 @@ impl Game {
             self.blocks_color
                 .insert(0, vec![ColorRaw::WITHE; WIDTH_BLOCKS_COUNT as usize]);
         }
+        // println!("clean line: {}", line_nums.len());
         self.score.add_score_by_clear_lines(line_nums.len() as u32)
     }
 }
