@@ -12,7 +12,7 @@ use game::game::Game;
 use settings::settings::*;
 
 // to-do
-// 游戏开始/失败界面，图片/音乐，内部窗口，分数
+// 内部窗口，分数
 fn main() -> Result<(), String> {
     let (mut canvas, sdl_context) = init_sdl()?;
     let mut g = Game::new();
