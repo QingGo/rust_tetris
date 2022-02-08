@@ -1,5 +1,14 @@
 ## 用 Rust + SDL2 实现俄罗斯方块游戏
+## Build
+### Windows
+``` bash
+# use build.rs to download sdl2 lib
+cargo build
+```
+### MAC:
+```
+brew install sdl2 sdl2_mixer sdl2_image sdl2_ttf
+LIBRARY_PATH="$LIBRARY_PATH:$(brew --prefix)/lib" cargo build
+```
 
 ![](./image/screenshot.png)
-
-The last Window-x64 build can be found in https://github.com/QingGo/rust_tetris/actions -> [the last successful run of actions] -> Summary -> Artifacts
