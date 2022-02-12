@@ -1,20 +1,13 @@
 [package]
+edition = "2021"
 name = "rust_tetris"
 version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8.4"
-sdl2 =  { version = "0.34", features = ["image", "mixer", "ttf"] }
+# remove dynamic feature when release
+# bevy = { version = "0.6.0", features = ["dynamic"] }
+bevy = "0.6.0"
 
-
-[build-dependencies]
-reqwest = { version = "0.11", features = ["blocking"] }
-futures = "0.3.16"
-zip = "0.5.13"
-
-# SET PATH=%PATH%;E:\vcpkg\installed\x64-windows\bin
-# SET INCLUDE=%INCLUDE%;E:\vcpkg\installed\x64-windows\include
-# SET LIB=%LIB%;E:\vcpkg\installed\x64-windows\lib
+# Enable only a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1

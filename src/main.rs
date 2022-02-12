@@ -1,72 +1,72 @@
-mod game;
-mod settings;
+use bevy::prelude::*;
 
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
-use std::time::Duration;
-use std::time::{SystemTime, UNIX_EPOCH};
+/// This example illustrates how to create parent->child relationships between entities how parent
+/// transforms are propagated to their descendants
+fn main() {
+    App::new()
+        .insert_resource(Msaa { samples: 4 })
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(setup)
+        .add_system(rotator_system)
+        .run();
+}
 
-use game::game::Game;
-use settings::settings::*;
+/// this component indicates what entities should rotate
+#[derive(Component)]
+struct Rotator;
 
-// to-do
-// 内部窗口，分数
-fn main() -> Result<(), String> {
-    let (mut canvas, sdl_context) = init_sdl()?;
-    let mut g = Game::new();
-    let mut last_time = get_epoch_ms();
-    'mainloop: loop {
-        // 获取输入
-        for event in sdl_context.event_pump()?.poll_iter() {
-            match event {
-                Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                }
-                | Event::Quit { .. } => break 'mainloop,
-                others => g.reveive_event(others),
-            }
-        }
-
-        // update the game loop here
-        let time_now = get_epoch_ms();
-        if time_now.wrapping_sub(last_time) >= MOVE_BETWEEN_MILLISECOND {
-            // 更新状态
-            // // println!("{} {}", last_time, time_now);
-            last_time = time_now;
-            g.update();
-            // 渲染
-            g.render(&mut canvas)?;
-            // 展示
-            canvas.present();
-        }
-
-        std::thread::sleep(Duration::from_millis(POLL_EVENT_INTERVAL_MILLISECOND));
+/// rotates the parent, which will result in the child also rotating
+fn rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Rotator>>) {
+    for mut transform in query.iter_mut() {
+        transform.rotation *= Quat::from_rotation_x(3.0 * time.delta_seconds());
     }
-    Ok(())
 }
 
-fn get_epoch_ms() -> u128 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis()
-}
+/// set up a simple scene with a "parent" cube and a "child" cube
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let cube_handle = meshes.add(Mesh::from(shape::Cube { size: 2.0 }));
+    let cube_material_handle = materials.add(StandardMaterial {
+        base_color: Color::YELLOW,
+        ..Default::default()
+    });
 
-fn init_sdl() -> Result<(Canvas<Window>, sdl2::Sdl), String> {
-    let sdl_context = sdl2::init()?;
-    let video_subsystem = sdl_context.video()?;
-    let window = video_subsystem
-        .window("Rust Tetris", WIDTH, HIGHT)
-        .position_centered()
-        .build()
-        .map_err(|e| e.to_string())?;
-    let canvas = window
-        .into_canvas()
-        .accelerated()
-        .build()
-        .map_err(|e| e.to_string())?;
-    Ok((canvas, sdl_context))
+    let child = commands.spawn_bundle(PbrBundle {
+            mesh: cube_handle.clone(),
+            material: cube_material_handle.clone(),
+            transform: Transform::from_xyz(-5.0, 0.0, 1.0),
+            ..Default::default()
+        }).id();
+    let mut _parent = commands.spawn_bundle(PbrBundle {
+            mesh: cube_handle.clone(),
+            material: cube_material_handle.clone(),
+            transform: Transform::from_xyz(0.0, 0.0, 1.0),
+            ..Default::default()
+    });
+
+    // parent cube
+    _parent.insert(Rotator)
+        .with_children(|parent| {
+            // child cube
+            parent.spawn_bundle(PbrBundle {
+                mesh: cube_handle,
+                material: cube_material_handle,
+                transform: Transform::from_xyz(1.0, 1.0, 3.0),
+                ..Default::default()
+            });
+        });
+     _parent.add_child(child);
+    // light
+    commands.spawn_bundle(PointLightBundle {
+        transform: Transform::from_xyz(4.0, 5.0, -3.0),
+        ..Default::default()
+    });
+    // camera
+    commands.spawn_bundle(PerspectiveCameraBundle {
+        transform: Transform::from_xyz(5.0, 10.0, 10.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..Default::default()
+    });
 }

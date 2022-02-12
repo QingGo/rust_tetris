@@ -2,3 +2,5 @@
 SDL2*/
 *.zip
 *.dll
+wgpu_trace
+trace-*.json
